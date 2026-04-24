@@ -1,0 +1,29 @@
+[package]
+name = "mensura"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+default = ["std"]
+std = ["alloc", "approx?/std"]
+alloc = []
+approx = ["dep:approx"]
+libm = ["dep:libm"]
+serde = ["dep:serde"]
+bytemuck = ["dep:bytemuck"]
+rand = ["dep:rand"]
+num-traits = ["dep:num-traits"]
+nalgebra = ["dep:nalgebra"]
+
+[dependencies]
+approx = { version = "0.5.1", default-features = false, optional = true }
+bytemuck = { version = "1", optional = true }
+libm = { version = "0.2", optional = true }
+num-traits = { version = "0.2", optional = true, default-features = false }
+rand = { version = "0.10", optional = true, default-features = false }
+serde = { version = "1", optional = true, default-features = false }
+nalgebra = { version = "0.34.2", default-features = false, optional = true }
+pastey = "0.2.2"
+
+[dev-dependencies]
+rand = "0.10"
