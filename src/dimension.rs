@@ -119,7 +119,8 @@ impl const Mul<i32> for Dimension {
 /// Divides every exponent by a scalar - used when taking an nth root via
 /// [`Quantity::nroot`](crate::quantity::Quantity::nroot).
 ///
-/// Panics at compile time if any exponent is not evenly divisible by `rhs`.
+/// Finds some way to fail if any exponent is not evenly divisible by `rhs`
+/// (likely a consteval panic due to division by zero)
 impl const Div<i32> for Dimension {
     type Output = Self;
 

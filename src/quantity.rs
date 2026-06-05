@@ -12,7 +12,7 @@ use private::True;
 
 use crate::{
     dimension::{Dimension, checks},
-    unit::{Unit, UnitAffine},
+    unit::Unit,
 };
 
 mod private {
@@ -149,6 +149,7 @@ impl<const D: Dimension> Quantity<D> {
     pub const fn new<U: Unit>(value: f64) -> Self
     where
         [(); { checks::eq(D, U::DIM) } as usize]: True,
+        [(); { U::INTERCEPT == 0.0 } as usize]: True,
     {
         Self(value * U::SLOPE)
     }
@@ -158,7 +159,7 @@ impl<const D: Dimension> Quantity<D> {
     /// The value is converted to SI immediately: `SI = U::SLOPE * value +
     /// U::INTERCEPT`. Fails to compile if `U::DIM != D` or if `U` has a
     /// zero intercept (use [`new`](Self::new) for linear units).
-    pub const fn new_affine<U: UnitAffine>(value: f64) -> Self
+    pub const fn new_affine<U: Unit>(value: f64) -> Self
     where
         [(); { checks::eq(D, U::DIM) } as usize]: True,
         [(); { U::INTERCEPT != 0.0 } as usize]: True,
@@ -178,7 +179,7 @@ impl<const D: Dimension> Quantity<D> {
     /// Applies the inverse conversion: `unit_value = (SI - U::INTERCEPT) /
     /// U::SLOPE`. Works for both linear and affine units. Fails to compile
     /// if `U::DIM != D`.
-    pub const fn get<U: UnitAffine>(self) -> f64
+    pub const fn get<U: Unit>(self) -> f64
     where
         [(); { checks::eq(D, U::DIM) } as usize]: True,
     {

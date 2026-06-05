@@ -44,7 +44,7 @@
 //! ```
 //!
 //! `Quantity::new` and `Quantity::get` apply this formula automatically, so
-//! callers never need to touch [`Unit::SLOPE`] or [`UnitAffine::INTERCEPT`]
+//! callers never need to touch [`Unit::SLOPE`] or [`Unit::INTERCEPT`]
 //! directly.
 
 #![allow(non_camel_case_types)]
@@ -53,30 +53,8 @@ use core::f64;
 
 use crate::dimension::Dimension;
 
-/// Describes the linear relationship between a concrete unit and the SI base
+/// Describes the relationship between a concrete unit and the SI base
 /// unit for a given physical quantity.
-///
-/// The conversion from a value expressed *in this unit* to the internal SI
-/// representation is:
-///
-/// ```text
-/// SI_value = SLOPE * unit_value
-/// ```
-pub trait Unit {
-    const DIM: Dimension;
-
-    /// Multiplicative factor to convert from this unit to the SI base unit.
-    ///
-    /// `SI_value = SLOPE * unit_value`
-    ///
-    /// For the base unit itself this is always `1.0`.
-    const SLOPE: f64;
-}
-
-/// Describes the affine relationship between a concrete unit and the SI base
-/// unit for a given physical quantity. This is used for temperature scales
-/// like Celsius and Fahrenheit, which have a non-zero intercept with the SI
-/// base unit (kelvin).
 ///
 /// The conversion from a value expressed *in this unit* to the internal SI
 /// representation is:
@@ -85,7 +63,7 @@ pub trait Unit {
 /// SI_value   = SLOPE * unit_value + INTERCEPT
 /// unit_value = (SI_value - INTERCEPT) / SLOPE
 /// ```
-pub trait UnitAffine {
+pub trait Unit {
     const DIM: Dimension;
 
     /// Multiplicative factor to convert from this unit to the SI base unit.
@@ -96,15 +74,7 @@ pub trait UnitAffine {
     /// Additive factor to convert from this unit to the SI base unit.
     ///
     /// For the base unit itself this is always `0.0`.
-    const INTERCEPT: f64;
-}
-
-/// Blanket implementation for linear units: any `Unit` is also a `UnitAffine`
-/// with zero intercept.
-impl<U: Unit> UnitAffine for U {
-    const DIM: Dimension = U::DIM;
     const INTERCEPT: f64 = 0.0;
-    const SLOPE: f64 = U::SLOPE;
 }
 
 macro_rules! impl_unit {
@@ -168,7 +138,7 @@ macro_rules! impl_unit {
         pub struct $unit;
         $(pub type $alias = $unit;)*
 
-        impl UnitAffine for $unit {
+        impl Unit for $unit {
             const DIM: Dimension = Quantity::DIM;
             const SLOPE: f64 = $slope;
             const INTERCEPT: f64 = $intercept;
@@ -183,7 +153,7 @@ macro_rules! impl_unit {
                 #[test]
                 fn conversion() {
                     let unit = rand::random::<f64>() * 1e6 - 5e5;
-                    let si = <$unit as UnitAffine>::SLOPE * unit + <$unit as UnitAffine>::INTERCEPT;
+                    let si = <$unit as Unit>::SLOPE * unit + <$unit as Unit>::INTERCEPT;
 
                     let qty = Quantity::new_affine::<$unit>(unit);
                     let qty_si = qty.si();
