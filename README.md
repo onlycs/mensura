@@ -1,6 +1,6 @@
 # mensura
 
-Compile-time dimensional analysis for physical quantities in Rust, built on const generics.
+Compile-time dimensional analysis for physical quantities in Rust, built on const generics, and under one thousand lines of code.
 
 ## Features
 
